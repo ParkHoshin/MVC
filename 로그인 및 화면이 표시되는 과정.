@@ -1,5 +1,8 @@
 ```
 톰캣 서버를 실행하면 톰캣은 servers 폴더의 context.xml 파일을 읽어온 후 , context.xml 파일 안에 있는 <WatchResource> 태그에 의해  web.xml 파일을 load 한다.
 web.xml 파일에 <welcome-file-list>태그의 index.jsp가 load된다.
-  
+
+전체적인 순서 context.xml -> web.xml -> index.jsp -> context-security -> LoginSuccessHandler.java -> LoginController.java -> LoginSuccess.java ->MainController.java 
+return "main";
+```  
   
