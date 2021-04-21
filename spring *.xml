@@ -1,0 +1,75 @@
+```
+1.context-aop.xml 
+  AOP(Aspect-Oriented Programming) 는 OOP를 보완하는 수단으로, 흩어진 Aspect 를 모듈화 할 수 있는 프로그래밍 기법이다.
+  즉, 여러 곳에서 쓰이는 공통 기능을 모듈화하고, 쓰이는 곳에 필요할 때 연결함으로써, 유지 보수 혹은 재사용에 용이하도록 프로그래밍 하는 것.
+  예시)
+	<aop:config proxy-target-class="true"> ---->인터페이스 없이 클래스에 직접 프록시(중계기능)를 적용하려면 이 애트리뷰트를 true로 바꿔주면 된다.
+		<aop:aspect id="quadmax.actionAspect" ref="quadmax.action">
+			<aop:before pointcut="execution(public * com.ecs.quadmax..*Controller.*(..))" method="beforeHandleController"/> ---------------->메소드 실행 전 Advice 실행
+			<aop:after pointcut="execution(public * com.ecs.quadmax..*Controller.*(..))" method="afterHandleController"/> ------------------->메소드 실행 후 Advice 실행
+			<aop:around pointcut="execution(public * com.ecs.quadmax..*Controller.*(..))" method="handleController" /> ---------------------->메소드 실행 전과 후 Advice 실행 (Before + After)
+		</aop:aspect>
+	</aop:config>
+2.context-common.xml
+ 공통되거나 일반적인 설정을 한다.예를 들어 property 설정을 하는데 캠페인 프로젝트에는 application.properties 와 jdbc.properties를 설정해놓음.
+ 공통으로 다국어 처리를 위해 messageSource 프로퍼티 설정.
+ 예시)
+<util:properties id="application" location="classpath:/properties/application.properties">
+	</util:properties>
+	<util:properties id="jdbc" location="classpath:/properties/jdbc.properties">
+	</util:properties>
+3.context-datasource.xml
+ DB접속 설정관련 datasource를 설정 합니다.
+ 예시)
+ 	<bean id="dataSource-quadmax" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.QuadMax.DriverClassName}"/>
+		<property name="url" value="${jdbc.QuadMax.Url}" />
+		<property name="username" value="${jdbc.QuadMax.UserName}"/>
+		<property name="password" value="${jdbc.QuadMax.Password}"/>
+	</bean>
+4.context-mybatis.xml
+사용할 sql문들을 mapper에 등록하고,sqlsession을 통해서 불러쓰면 됨.
+session빌드 및 사용
+- 실제 sql문 실행
+- 설정 파일을 먹여서 SqlSessionFactoryBulder를 객체생성
+- SqlSessoinFactoryBuilder을 이용해서 SqlSession을 open
+- SqlSession을 통해서 원하는 sql구문의 id를 호출해서 사용
+-SqlSession을 close
+예시)
+-sql문을 실제 호출해주는 역할.
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="quadMax.dataSource" />
+		<property name="databaseIdProvider" ref="databaseIdProvider" />
+		<property name="configLocation" value="classpath:mybatis/mybatis-config.xml"></property>
+		<property name="mapperLocations">
+			<array>
+				<value>classpath:mybatis/mapper/quadmax/**/*Mapper.xml</value>
+			</array>
+		</property>
+	</bean>
+
+-sqlSession을 만드는 역할. (Dao는 Factory을 멤버로 유지하면서 필요할 때 SqlSession을 open해서 사용하고 다쓰면 sqlSession을close) 
+  	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.ecs.quadmax.**.dao.**, com.ecs.api.**.dao.**, com.ecs.marketing.**.dao.**"></property>
+		<property name="sqlSessionFactoryBeanName" value="sqlSession"></property>
+	</bean>
+
+5.context-quadmaxuserdetailshelper.xml
+ <!--인증된 유저의 LoginVO, 권한, 인증 여부를 확인 할 수있는 서비스 클래스-->
+	<bean id="quadMaxUserDetailsHelper" class="com.ecs.quadmax.common.util.QuadMaxUserDetailsHelper">
+        <property name="quadMaxUserDetailsService">
+            <ref bean="quadMaxUserDetailsSecurityService" />
+        </property>
+    </bean>
+6.context-transaction.xml
+  트랜젝션 설정을 해준다.
+  캠페인 기준
+<tx:method name="select*" propagation="REQUIRED" isolation="READ_COMMITTED" rollback-for="Exception" read-only="false"/>
+			<tx:method name="get*" propagation="REQUIRED" isolation="READ_COMMITTED" rollback-for="Exception" read-only="false"/>
+			<tx:method name="insert*" propagation="REQUIRED" isolation="READ_COMMITTED" rollback-for="Exception" read-only="false"/>
+			<tx:method name="update*" propagation="REQUIRED" isolation="READ_COMMITTED" rollback-for="Exception" read-only="false"/>
+			<tx:method name="delete*" propagation="REQUIRED" isolation="READ_COMMITTED" rollback-for="Exception" read-only="false"/>
+			<tx:method name="execute*" propagation="REQUIRED" isolation="READ_COMMITTED" rollback-for="Exception" read-only="false"/>
+			<tx:method name="save*" propagation="REQUIRED" isolation="READ_COMMITTED" rollback-for="Exception" read-only="false"/>
+			<tx:method name="*" propagation="REQUIRED" isolation="READ_COMMITTED" rollback-for="Exception" read-only="false"/>ㅜ
+name 별로 상황을 구분하고 Exception이 났을때 롤백하는것으로 설정되어있다.
