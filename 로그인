@@ -1,9 +1,0 @@
-```
-캠페인 프로젝트의 view.
-web.xml에서의 setting 
-
-1.index.jsp 에서 form 안에 action ="/j_spring_security_check"
-2.context-security.xml 의 login-processing-url="/j_spring_security_check" 매핑 되어있고, 성공,실패 핸들러가 담겨있음.
-3.로그인 성공 시 loginSuccessHandler.java를 타게 되어 sendRedirect("/login/LoginSuccess.do"); 로 이동함.
-4.LoginController의 @RequestMapping(value = "/LoginSuccess.do")로 이동하여 LoginSuccess.jsp로 넘겨준다.
-5.LoginSuccess.jsp에서 userVo 변수 선언하여 userVo.lang || 'ko_KR' .
