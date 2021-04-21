@@ -1,3 +1,9 @@
 ```
-웹 기반의 요청에 대한 동적인 처리가 가능한 하나의 클래스이다.(servlet이 만들어지고 더욱더 쉽게 만든것이 jsp)
+웹 기반의 요청에 대한 동적인 처리가 가능한 하나의 클래스이다.(servlet이 만들어지고 더욱더 쉽게 만든것이 jsp이다.)
 Server Side에서 돌아가는 Java program.
+순서는 웹 브라우저 클라이언트의 요청이 들어왔을때 WAS에서 Servlet 객체 생성을 한다. 
+init() : 위에서 생성된 Servlet이 메모리에 로드 될때 init() 메서드가 호출된다.*단 한번만 수행 됨.
+service(request,response) : 응답에 대한 모든 내용은 service()메서드에 구현해야 하고,Servlet이 수신한 모든 request에 대해 service() 메서드가 호출횐 뒤 메서드가 return 하면 부여받은 쓰레드는 제거된다
+destroy() : Web Application이 갱신되거나 WAS가 종료될 떄 호출되는데,servlet 객체를 메모리에서 제거 한다.
+
+
